@@ -14,11 +14,13 @@ import teamRoutes from './routes/teamRoutes.js';
 import contactRoutes from './routes/contactRouter.js';
 
 dotenv.config();
-
+  
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.promises.mkdir(uploadsDir, { recursive: true })
     .then(() => console.log('✅ Uploads directory ready'))
@@ -29,47 +31,37 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
 app.use('/api/projects', projectRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/contact', contactRoutes);
-app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello from Vercel!' });
-});
 
-// 404
 app.use((req, res) => {
-  res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
+    res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
 });
 
-// Error handler
 app.use((err, req, res, next) => {
-  console.error(`[${new Date().toISOString()}] Error on ${req.method} ${req.originalUrl}:`, err);
-  if (req.files && (req.files.main || req.files.gallery)) {
-    cleanupUploadedImages(req.files);
-  }
-  res.status(500).json({
-    success: false,
-    message: 'Unexpected server error',
-    error: err.message,
-  });
+    console.error(`[${new Date().toISOString()}] Error on ${req.method} ${req.originalUrl}:`, err);
+    if (req.files && (req.files.main || req.files.gallery)) {
+        cleanupUploadedImages(req.files);
+    }
+    res.status(500).json({
+        success: false,
+        message: 'Unexpected server error',
+        error: err.message,
+    });
 });
 
 mongoose.connect(process.env.MONGO_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 })
-  .then(() => {
-    console.log('✅ Connected to MongoDB');
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+    .then(() => {
+        console.log('✅ Connected to MongoDB');
+        app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    })
+    .catch(err => {
+        console.error('❌ MongoDB connection error:', err.message);
     });
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection error:', err.message);
-  });
-
