@@ -1,0 +1,14 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directory
+node_modules/
+
+# Local environment overrides
+*.local
+
+# Editor-specific folders 
+.vscode/*
+
