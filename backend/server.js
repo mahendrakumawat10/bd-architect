@@ -37,7 +37,7 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/contact', contactRoutes);
-app.get('/', (req, res) => {
+app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from Vercel!' });
 });
 
